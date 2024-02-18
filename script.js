@@ -18,8 +18,6 @@ if (localStorage.getItem('nickname')) {
 }
 
 
-
-
 class MovingObject {
   constructor(x, y, width, height, color = 'grey') {
     this.x = x;
@@ -91,8 +89,6 @@ function renderImages() {
   trapsTwo.x -= 10 + (gameSpeed / 100)
 }
 
-
-
 function jump() {
   if (posY < 399) {
     g += 3
@@ -102,7 +98,6 @@ function jump() {
     g = 3
   }
 }
-
 
 function startGame() {
   let interval = setInterval(() => {
@@ -123,7 +118,6 @@ function startGame() {
   }, 15)
 }
 
-
 function pauseGame() {
   let interval = setInterval(() => {
     console.log('pause')
@@ -139,13 +133,12 @@ function pauseGame() {
   }, 800)
 }
 
-
 function drawPouse(count) {
   ctx.fillStyle = 'black';
   ctx.font = "160px serif";
   ctx.fillText(`${count}`, 650, 300)
+  ctx.fillText(`Points: ${countPoints}`, 350, 450)
 }
-
 
 function renderPoints(points) {
   ctx.fillStyle = 'black';
@@ -153,7 +146,6 @@ function renderPoints(points) {
   ctx.fillText(`${userName}: ${points}`, 620, 30)
 }
 
-// render rect
 function renderLine() {
   ctx.strokeStyle = "grey";
   ctx.setLineDash([10, 0]);
@@ -173,8 +165,6 @@ function renderMeme(x, y) {
     img.src = 'images/meme.png'
     ctx.drawImage(img, x, y, 50, 50);
 }
-
-
 
 document.addEventListener('keydown', (event) => {
   const key = event.key
