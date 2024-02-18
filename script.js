@@ -13,9 +13,8 @@ let userName = ''
 if (localStorage.getItem('nickname')) {
   userName = localStorage.getItem('nickname')
 } else {
-  let userName = prompt('What is your Name?')
-  localStorage.setItem('nickname', userName) 
-  userName = localStorage.getItem('nickname')
+  userName = prompt('What is your Name?')
+  localStorage.setItem('nickname', userName)
 }
 
 
