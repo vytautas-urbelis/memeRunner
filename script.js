@@ -115,7 +115,7 @@ function startGame() {
       countPoints += 1 + gameSpeed
     }
     renderPoints(countPoints)
-  }, 17)
+  }, 16)
 }
 
 function pauseGame() {
