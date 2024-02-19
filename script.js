@@ -174,5 +174,10 @@ document.addEventListener('keydown', (event) => {
 }, 
 )
 
+function jumpOnClick() {
+  console.log('clisk')
+  posY = 394
+}
+
 
 startGame()
