@@ -49,4 +49,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 Vytautas Urbelis
 
-Project Link: [MemeRunner](https://github.com/vytautas-urbelis/memeRunner/)
+Try it: [MemeRunner](https://vytautas-urbelis.github.io/memeRunner/)
