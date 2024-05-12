@@ -22,3 +22,31 @@ To run MemeRunner locally, follow these steps:
 1. Clone the repository:
    ```bash
    git clone [your-repository-link]
+
+2. Open the `index.html` file in a modern web browser.
+
+## How to Play
+
+- **Start the Game:** Open the `index.html` file in your browser to start the game.
+- **Jump:** Press the space bar to jump and avoid obstacles.
+- **Pause/Resume Game:** The game pauses automatically when an obstacle is hit and can be resumed by following on-screen instructions.
+
+## Contributing
+
+Contributions to the MemeRunner game are welcome! If you have suggestions or improvements, please fork the repository and submit a pull request.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## Contact
+
+Vytautas Urbelis
+
+Project Link: [MemeRunner](https://github.com/vytautas-urbelis/memeRunner/)
