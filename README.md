@@ -7,7 +7,6 @@ MemeRunner is a dynamic, browser-based game developed using JavaScript and HTML5
 - **Dynamic Obstacle Avoidance:** Players must avoid various obstacles that appear randomly on the track.
 - **Scoring System:** Points are accumulated by avoiding obstacles, and the game speed increases as the player's score gets higher.
 - **Local Storage for Scores:** Utilizes browser's local storage to save and retrieve player's nickname and scores.
-- **Responsive Game Mechanics:** Features such as jumping and pausing are mapped to keyboard inputs, providing a responsive gaming experience.
 
 ## Technologies Used
 
