@@ -14,6 +14,11 @@ let jumpCount = 0
 let canDoubleJump = true
 let animationFrame = 0
 let lastSpacePress = 0
+let ammunition = 3
+let lastAmmoRegenTime = Date.now()
+let bullets = []
+let explosions = []
+let shootingAnimation = 0
 if (localStorage.getItem('nickname')) {
   userName = localStorage.getItem('nickname')
 } else {
@@ -29,6 +34,7 @@ class MovingObject {
     this.width = width;
     this.height = height;
     this.color = color
+    this.destroyed = false
   }
 
   renderImage(image) {
@@ -41,8 +47,12 @@ class MovingObject {
   }
 
   renderTrap(image) {
+    if (this.destroyed) {
+      return
+    }
     if (this.x <= -55) {
       this.x = 14000
+      this.destroyed = false
       setTimeout(() => {
         this.x = 1400
       }, Math.random() * 5000) 
@@ -51,6 +61,89 @@ class MovingObject {
     const img = new Image();
     img.src = image
     ctx.drawImage(img, this.x, this.y, this.width, this.height);
+  }
+}
+
+class Bullet {
+  constructor(x, y) {
+    this.x = x
+    this.y = y
+    this.width = 10
+    this.height = 5
+    this.speed = 15
+    this.active = true
+  }
+
+  update() {
+    this.x += this.speed
+    if (this.x > canvasWidth) {
+      this.active = false
+    }
+  }
+
+  render() {
+    if (!this.active) return
+    ctx.fillStyle = '#FF6B00'
+    ctx.strokeStyle = '#FF4500'
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    ctx.arc(this.x, this.y, 4, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.stroke()
+    
+    // Add muzzle flash trail
+    ctx.fillStyle = 'rgba(255, 165, 0, 0.5)'
+    ctx.beginPath()
+    ctx.arc(this.x - 3, this.y, 3, 0, Math.PI * 2)
+    ctx.fill()
+  }
+}
+
+class Explosion {
+  constructor(x, y) {
+    this.x = x
+    this.y = y
+    this.frame = 0
+    this.maxFrames = 20
+    this.particles = []
+    
+    // Create explosion particles
+    for (let i = 0; i < 15; i++) {
+      this.particles.push({
+        x: 0,
+        y: 0,
+        vx: (Math.random() - 0.5) * 10,
+        vy: (Math.random() - 0.5) * 10,
+        size: Math.random() * 8 + 2,
+        color: ['#FF6B00', '#FF4500', '#FFD700', '#FFA500'][Math.floor(Math.random() * 4)]
+      })
+    }
+  }
+
+  update() {
+    this.frame++
+    this.particles.forEach(p => {
+      p.x += p.vx
+      p.y += p.vy
+      p.vy += 0.3 // gravity
+      p.size *= 0.95
+    })
+  }
+
+  render() {
+    const alpha = 1 - (this.frame / this.maxFrames)
+    this.particles.forEach(p => {
+      ctx.fillStyle = p.color
+      ctx.globalAlpha = alpha
+      ctx.beginPath()
+      ctx.arc(this.x + p.x, this.y + p.y, p.size, 0, Math.PI * 2)
+      ctx.fill()
+    })
+    ctx.globalAlpha = 1
+  }
+
+  isFinished() {
+    return this.frame >= this.maxFrames
   }
 }
 
@@ -72,10 +165,18 @@ function restartGame() {
   trapsTwo.x = 1200
   trapsThree.x = 1600
   trapsFour.x = 2000
+  trapsOne.destroyed = false
+  trapsTwo.destroyed = false
+  trapsThree.destroyed = false
+  trapsFour.destroyed = false
   gameSpeed = 0
   countPoints = 0
   jumpCount = 0
   canDoubleJump = true
+  ammunition = 3
+  bullets = []
+  explosions = []
+  lastAmmoRegenTime = Date.now()
 }
 
 function renderImages() {
@@ -115,6 +216,71 @@ function jump() {
   }
 }
 
+function shoot() {
+  if (ammunition > 0) {
+    ammunition--
+    const bullet = new Bullet(posX + 45, posY + 25)
+    bullets.push(bullet)
+    shootingAnimation = 10 // Show shooting animation for 10 frames
+  }
+}
+
+function regenerateAmmo() {
+  const currentTime = Date.now()
+  if (ammunition < 3 && currentTime - lastAmmoRegenTime >= 3000) {
+    ammunition++
+    lastAmmoRegenTime = currentTime
+  }
+}
+
+function updateBullets() {
+  bullets.forEach(bullet => bullet.update())
+  bullets = bullets.filter(b => b.active)
+}
+
+function renderBullets() {
+  bullets.forEach(bullet => bullet.render())
+}
+
+function checkBulletCollisions() {
+  const obstacles = [trapsOne, trapsTwo, trapsThree, trapsFour]
+  
+  bullets.forEach(bullet => {
+    if (!bullet.active) return
+    
+    obstacles.forEach(obstacle => {
+      if (obstacle.destroyed) return
+      
+      // Check collision
+      if (bullet.x >= obstacle.x && bullet.x <= obstacle.x + obstacle.width &&
+          bullet.y >= obstacle.y && bullet.y <= obstacle.y + obstacle.height) {
+        bullet.active = false
+        obstacle.destroyed = true
+        explosions.push(new Explosion(obstacle.x + obstacle.width / 2, obstacle.y + obstacle.height / 2))
+        
+        // Move obstacle off screen and reset after delay
+        obstacle.x = 14000
+        setTimeout(() => {
+          obstacle.x = 1400
+          obstacle.destroyed = false
+        }, Math.random() * 5000 + 2000)
+        
+        // Award points for destroying obstacle
+        countPoints += 50
+      }
+    })
+  })
+}
+
+function updateExplosions() {
+  explosions.forEach(exp => exp.update())
+  explosions = explosions.filter(exp => !exp.isFinished())
+}
+
+function renderExplosions() {
+  explosions.forEach(exp => exp.render())
+}
+
 function startGame() {
   let interval = setInterval(() => {
     gameSpeed += 1
@@ -124,17 +290,33 @@ function startGame() {
     renderImages()
     renderMeme(posX, posY)
     jump()
-    if (posX+40 >= trapsOne.x - 1 && posX+40 <= trapsOne.x + 50 && posY+40 >= trapsOne.y -1 && posY+40 <= trapsOne.y + 50 || 
-        posX+40 >= trapsTwo.x - 1 && posX+40 <= trapsTwo.x + 50 && posY+40 >= trapsTwo.y -1 && posY+40 <= trapsTwo.y + 50 ||
-        posX+40 >= trapsThree.x - 1 && posX+40 <= trapsThree.x + 50 && posY+40 >= trapsThree.y -1 && posY+40 <= trapsThree.y + 50 ||
-        posX+40 >= trapsFour.x - 1 && posX+40 <= trapsFour.x + 50 && posY+40 >= trapsFour.y -1 && posY+40 <= trapsFour.y + 50) {
+    
+    // Update and render ammunition system
+    regenerateAmmo()
+    renderAmmo()
+    
+    // Update and render bullets
+    updateBullets()
+    renderBullets()
+    
+    // Check bullet collisions
+    checkBulletCollisions()
+    
+    // Update and render explosions
+    updateExplosions()
+    renderExplosions()
+    
+    if (posX+40 >= trapsOne.x - 1 && posX+40 <= trapsOne.x + 50 && posY+40 >= trapsOne.y -1 && posY+40 <= trapsOne.y + 50 && !trapsOne.destroyed || 
+        posX+40 >= trapsTwo.x - 1 && posX+40 <= trapsTwo.x + 50 && posY+40 >= trapsTwo.y -1 && posY+40 <= trapsTwo.y + 50 && !trapsTwo.destroyed ||
+        posX+40 >= trapsThree.x - 1 && posX+40 <= trapsThree.x + 50 && posY+40 >= trapsThree.y -1 && posY+40 <= trapsThree.y + 50 && !trapsThree.destroyed ||
+        posX+40 >= trapsFour.x - 1 && posX+40 <= trapsFour.x + 50 && posY+40 >= trapsFour.y -1 && posY+40 <= trapsFour.y + 50 && !trapsFour.destroyed) {
       clearInterval(interval)
       pauseGame()
     }
-    if (posX+40 >= trapsOne.x - 1 && posX+40 <= trapsOne.x + 50 || 
-        posX+40 >= trapsTwo.x - 1 && posX+40 <= trapsTwo.x + 50 ||
-        posX+40 >= trapsThree.x - 1 && posX+40 <= trapsThree.x + 50 ||
-        posX+40 >= trapsFour.x - 1 && posX+40 <= trapsFour.x + 50) {
+    if (posX+40 >= trapsOne.x - 1 && posX+40 <= trapsOne.x + 50 && !trapsOne.destroyed || 
+        posX+40 >= trapsTwo.x - 1 && posX+40 <= trapsTwo.x + 50 && !trapsTwo.destroyed ||
+        posX+40 >= trapsThree.x - 1 && posX+40 <= trapsThree.x + 50 && !trapsThree.destroyed ||
+        posX+40 >= trapsFour.x - 1 && posX+40 <= trapsFour.x + 50 && !trapsFour.destroyed) {
       countPoints += 1 + gameSpeed
     }
     renderPoints(countPoints)
@@ -169,6 +351,35 @@ function renderPoints(points) {
   ctx.fillText(`${userName}: ${points}`, 620, 30)
 }
 
+function renderAmmo() {
+  ctx.fillStyle = 'black';
+  ctx.font = "30px serif";
+  ctx.fillText('Ammo:', 20, 35)
+  
+  // Draw ammunition bullets
+  for (let i = 0; i < 3; i++) {
+    if (i < ammunition) {
+      // Active ammunition - draw filled bullet
+      ctx.fillStyle = '#FF6B00'
+      ctx.strokeStyle = '#FF4500'
+    } else {
+      // Empty ammunition - draw outline only
+      ctx.fillStyle = 'rgba(255, 107, 0, 0.2)'
+      ctx.strokeStyle = 'rgba(255, 69, 0, 0.3)'
+    }
+    
+    ctx.lineWidth = 2
+    const x = 120 + (i * 30)
+    const y = 25
+    
+    // Draw bullet shape
+    ctx.beginPath()
+    ctx.arc(x, y, 8, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.stroke()
+  }
+}
+
 function renderLine() {
   ctx.strokeStyle = "grey";
   ctx.setLineDash([10, 0]);
@@ -193,6 +404,36 @@ function renderMeme(x, y) {
   ctx.translate(x + 25, y + 25)
   ctx.rotate(tilt)
   ctx.drawImage(img, -25, -25 - bounce, 50, 50)
+  
+  // Draw gun
+  ctx.fillStyle = '#333'
+  ctx.strokeStyle = '#000'
+  ctx.lineWidth = 2
+  
+  // Gun barrel
+  const gunRecoil = shootingAnimation > 0 ? -5 : 0
+  ctx.fillRect(20 + gunRecoil, -5, 20, 8)
+  ctx.strokeRect(20 + gunRecoil, -5, 20, 8)
+  
+  // Gun handle
+  ctx.fillRect(15, -5, 8, 12)
+  ctx.strokeRect(15, -5, 8, 12)
+  
+  // Muzzle flash effect when shooting
+  if (shootingAnimation > 0) {
+    ctx.fillStyle = `rgba(255, 165, 0, ${shootingAnimation / 10})`
+    ctx.beginPath()
+    ctx.arc(40, -1, 8, 0, Math.PI * 2)
+    ctx.fill()
+    
+    ctx.fillStyle = `rgba(255, 69, 0, ${shootingAnimation / 15})`
+    ctx.beginPath()
+    ctx.arc(40, -1, 5, 0, Math.PI * 2)
+    ctx.fill()
+    
+    shootingAnimation--
+  }
+  
   ctx.restore()
 }
 
@@ -211,6 +452,8 @@ document.addEventListener('keydown', (event) => {
       jumpCount = 1
     }
     lastSpacePress = currentTime
+  } else if (key === 'x' || key === 'X' || key === 'f' || key === 'F') {
+    shoot()
   }
 }, 
 )
