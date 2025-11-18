@@ -10,6 +10,10 @@ let g = 3
 let count = 0
 let countPoints = 0
 let userName = ''
+let jumpCount = 0
+let canDoubleJump = true
+let animationFrame = 0
+let lastSpacePress = 0
 if (localStorage.getItem('nickname')) {
   userName = localStorage.getItem('nickname')
 } else {
@@ -59,13 +63,19 @@ class MovingObject {
   let botSecond = new MovingObject(600, 220, 160, 160)
   let trapsOne = new MovingObject(900, 410, 50, 50)
   let trapsTwo = new MovingObject(1200, 410, 50, 50)
+  let trapsThree = new MovingObject(1600, 410, 50, 50)
+  let trapsFour = new MovingObject(2000, 410, 50, 50)
          
 
 function restartGame() {
   trapsOne.x = 900
   trapsTwo.x = 1200
+  trapsThree.x = 1600
+  trapsFour.x = 2000
   gameSpeed = 0
   countPoints = 0
+  jumpCount = 0
+  canDoubleJump = true
 }
 
 function renderImages() {
@@ -84,9 +94,13 @@ function renderImages() {
   botFirst.x -= 9 + (gameSpeed / 350)
   botSecond.x -= 9 + (gameSpeed / 350)
   trapsOne.renderTrap('images/treeG5.png')  
-  trapsTwo.renderTrap('images/treeG5.png')  
+  trapsTwo.renderTrap('images/treeG5.png')
+  trapsThree.renderTrap('images/treeG3.png')
+  trapsFour.renderTrap('images/treeG4.png')
   trapsOne.x -= 10 + (gameSpeed / 100)
   trapsTwo.x -= 10 + (gameSpeed / 100)
+  trapsThree.x -= 10 + (gameSpeed / 100)
+  trapsFour.x -= 10 + (gameSpeed / 100)
 }
 
 function jump() {
@@ -96,22 +110,31 @@ function jump() {
   } else {
     posY = 412
     g = 3
+    jumpCount = 0
+    canDoubleJump = true
   }
 }
 
 function startGame() {
   let interval = setInterval(() => {
     gameSpeed += 1
+    animationFrame += 1
     renderBg()
     renderLine()
     renderImages()
     renderMeme(posX, posY)
     jump()
-    if (posX+40 >= trapsOne.x - 1 && posX+40 <= trapsOne.x + 50 && posY+40 >= trapsOne.y -1 && posY+40 <= trapsOne.y + 50 || posX+40 >= trapsTwo.x - 1 && posX+40 <= trapsTwo.x + 50 && posY+40 >= trapsTwo.y -1 && posY+40 <= trapsTwo.y + 50) {
+    if (posX+40 >= trapsOne.x - 1 && posX+40 <= trapsOne.x + 50 && posY+40 >= trapsOne.y -1 && posY+40 <= trapsOne.y + 50 || 
+        posX+40 >= trapsTwo.x - 1 && posX+40 <= trapsTwo.x + 50 && posY+40 >= trapsTwo.y -1 && posY+40 <= trapsTwo.y + 50 ||
+        posX+40 >= trapsThree.x - 1 && posX+40 <= trapsThree.x + 50 && posY+40 >= trapsThree.y -1 && posY+40 <= trapsThree.y + 50 ||
+        posX+40 >= trapsFour.x - 1 && posX+40 <= trapsFour.x + 50 && posY+40 >= trapsFour.y -1 && posY+40 <= trapsFour.y + 50) {
       clearInterval(interval)
       pauseGame()
     }
-    if (posX+40 >= trapsOne.x - 1 && posX+40 <= trapsOne.x + 50 || posX+40 >= trapsTwo.x - 1 && posX+40 <= trapsTwo.x + 50) {
+    if (posX+40 >= trapsOne.x - 1 && posX+40 <= trapsOne.x + 50 || 
+        posX+40 >= trapsTwo.x - 1 && posX+40 <= trapsTwo.x + 50 ||
+        posX+40 >= trapsThree.x - 1 && posX+40 <= trapsThree.x + 50 ||
+        posX+40 >= trapsFour.x - 1 && posX+40 <= trapsFour.x + 50) {
       countPoints += 1 + gameSpeed
     }
     renderPoints(countPoints)
@@ -162,21 +185,49 @@ function renderBg() {
 
 function renderMeme(x, y) {
   const img = new Image();
-    img.src = 'images/meme.png'
-    ctx.drawImage(img, x, y, 50, 50);
+  img.src = 'images/meme.png'
+  // Create running animation by alternating the meme position
+  const bounce = Math.abs(Math.sin(animationFrame * 0.2)) * 3
+  const tilt = Math.sin(animationFrame * 0.15) * 0.1
+  ctx.save()
+  ctx.translate(x + 25, y + 25)
+  ctx.rotate(tilt)
+  ctx.drawImage(img, -25, -25 - bounce, 50, 50)
+  ctx.restore()
 }
 
 document.addEventListener('keydown', (event) => {
   const key = event.key
   if (key === ' ') {
-    posY = 394
+    const currentTime = Date.now()
+    // Check if space was pressed within 300ms for double jump
+    if (currentTime - lastSpacePress < 300 && jumpCount === 1 && canDoubleJump) {
+      posY = 350
+      g = 3
+      jumpCount = 2
+      canDoubleJump = false
+    } else if (jumpCount === 0) {
+      posY = 394
+      jumpCount = 1
+    }
+    lastSpacePress = currentTime
   }
 }, 
 )
 
 function jumpOnClick() {
-  console.log('clisk')
-  posY = 394
+  const currentTime = Date.now()
+  // Check if space was pressed within 300ms for double jump
+  if (currentTime - lastSpacePress < 300 && jumpCount === 1 && canDoubleJump) {
+    posY = 350
+    g = 3
+    jumpCount = 2
+    canDoubleJump = false
+  } else if (jumpCount === 0) {
+    posY = 394
+    jumpCount = 1
+  }
+  lastSpacePress = currentTime
 }
 
 
