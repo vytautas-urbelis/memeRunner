@@ -62,6 +62,120 @@ class MovingObject {
     img.src = image
     ctx.drawImage(img, this.x, this.y, this.width, this.height);
   }
+  
+  renderFlyingCar() {
+    if (this.x <= -120) {
+      this.x = 1400
+    }
+    
+    // Flying car body - futuristic sandy color
+    ctx.fillStyle = '#6B5A4D'
+    ctx.shadowColor = 'rgba(255, 140, 0, 0.4)'
+    ctx.shadowBlur = 10
+    ctx.fillRect(this.x, this.y, this.width, this.height * 0.6)
+    
+    // Car windshield
+    ctx.fillStyle = 'rgba(100, 150, 200, 0.6)'
+    ctx.fillRect(this.x + this.width * 0.6, this.y + 5, this.width * 0.35, this.height * 0.4)
+    
+    // Orange glow from engines
+    ctx.fillStyle = 'rgba(255, 100, 0, 0.8)'
+    ctx.shadowBlur = 15
+    ctx.fillRect(this.x - 5, this.y + this.height * 0.7, 10, 5)
+    ctx.fillRect(this.x - 5, this.y + this.height * 0.3, 10, 5)
+    
+    ctx.shadowBlur = 0
+  }
+  
+  renderCyberKiller() {
+    if (this.destroyed) {
+      return
+    }
+    if (this.x <= -55) {
+      this.x = 14000
+      this.destroyed = false
+      setTimeout(() => {
+        this.x = 1400
+      }, Math.random() * 5000)
+    }
+    
+    // Cyber killer robot body - dark metallic
+    ctx.save()
+    ctx.translate(this.x + this.width / 2, this.y + this.height)
+    
+    // Body
+    ctx.fillStyle = '#2C2416'
+    ctx.strokeStyle = '#D4A574'
+    ctx.lineWidth = 2
+    ctx.fillRect(-15, -40, 30, 40)
+    ctx.strokeRect(-15, -40, 30, 40)
+    
+    // Head with red visor
+    ctx.fillStyle = '#1A1410'
+    ctx.fillRect(-12, -55, 24, 15)
+    ctx.strokeRect(-12, -55, 24, 15)
+    
+    // Red glowing visor
+    ctx.fillStyle = '#FF0000'
+    ctx.shadowColor = 'rgba(255, 0, 0, 0.8)'
+    ctx.shadowBlur = 8
+    ctx.fillRect(-10, -50, 20, 4)
+    ctx.shadowBlur = 0
+    
+    // Legs
+    ctx.strokeStyle = '#D4A574'
+    ctx.lineWidth = 3
+    ctx.beginPath()
+    ctx.moveTo(-8, 0)
+    ctx.lineTo(-8, 10)
+    ctx.stroke()
+    ctx.beginPath()
+    ctx.moveTo(8, 0)
+    ctx.lineTo(8, 10)
+    ctx.stroke()
+    
+    // Arms with weapons
+    ctx.strokeStyle = '#8B6F47'
+    ctx.lineWidth = 2.5
+    ctx.beginPath()
+    ctx.moveTo(-15, -30)
+    ctx.lineTo(-22, -25)
+    ctx.stroke()
+    ctx.beginPath()
+    ctx.moveTo(15, -30)
+    ctx.lineTo(22, -25)
+    ctx.stroke()
+    
+    ctx.restore()
+  }
+  
+  renderHole() {
+    if (this.destroyed) {
+      return
+    }
+    if (this.x <= -55) {
+      this.x = 14000
+      this.destroyed = false
+      setTimeout(() => {
+        this.x = 1400
+      }, Math.random() * 5000)
+    }
+    
+    // Draw hole in ground - dark pit
+    ctx.fillStyle = '#1A0F0A'
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.8)'
+    ctx.shadowBlur = 10
+    ctx.beginPath()
+    ctx.ellipse(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, this.height / 3, 0, 0, Math.PI * 2)
+    ctx.fill()
+    
+    // Inner darker shadow
+    ctx.fillStyle = '#0A0505'
+    ctx.beginPath()
+    ctx.ellipse(this.x + this.width / 2, this.y + this.height / 2, this.width / 3, this.height / 4, 0, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.shadowBlur = 0
+  }
 }
 
 class Bullet {
@@ -83,28 +197,28 @@ class Bullet {
 
   render() {
     if (!this.active) return
-    // Cyberpunk bullet with neon glow
-    ctx.shadowColor = 'rgba(0, 255, 255, 0.9)'
+    // Orange bullet with glow matching Blade Runner theme
+    ctx.shadowColor = 'rgba(255, 140, 0, 0.9)'
     ctx.shadowBlur = 10
-    ctx.fillStyle = '#00FFFF'
-    ctx.strokeStyle = '#0080FF'
+    ctx.fillStyle = '#FF8C00'
+    ctx.strokeStyle = '#D4A574'
     ctx.lineWidth = 2
     ctx.beginPath()
     ctx.arc(this.x, this.y, 4, 0, Math.PI * 2)
     ctx.fill()
     ctx.stroke()
     
-    // Add electric trail
-    ctx.fillStyle = 'rgba(255, 0, 255, 0.6)'
-    ctx.shadowColor = 'rgba(255, 0, 255, 0.8)'
+    // Add trail
+    ctx.fillStyle = 'rgba(255, 69, 0, 0.6)'
+    ctx.shadowColor = 'rgba(255, 69, 0, 0.8)'
     ctx.shadowBlur = 8
     ctx.beginPath()
     ctx.arc(this.x - 3, this.y, 3, 0, Math.PI * 2)
     ctx.fill()
     
     // Energy core
-    ctx.fillStyle = '#FFFFFF'
-    ctx.shadowColor = 'rgba(255, 255, 255, 1)'
+    ctx.fillStyle = '#FFC870'
+    ctx.shadowColor = 'rgba(255, 200, 112, 1)'
     ctx.shadowBlur = 6
     ctx.beginPath()
     ctx.arc(this.x, this.y, 2, 0, Math.PI * 2)
@@ -122,7 +236,7 @@ class Explosion {
     this.maxFrames = 20
     this.particles = []
     
-    // Create cyberpunk explosion particles
+    // Create Blade Runner-style explosion particles
     for (let i = 0; i < 20; i++) {
       this.particles.push({
         x: 0,
@@ -130,7 +244,7 @@ class Explosion {
         vx: (Math.random() - 0.5) * 12,
         vy: (Math.random() - 0.5) * 12,
         size: Math.random() * 8 + 2,
-        color: ['#00FFFF', '#FF00FF', '#0080FF', '#FF0080'][Math.floor(Math.random() * 4)]
+        color: ['#FF8C00', '#FF6347', '#D4A574', '#FFA500'][Math.floor(Math.random() * 4)]
       })
     }
   }
@@ -198,24 +312,37 @@ function restartGame() {
 }
 
 function renderImages() {
-  upperFirst.renderImage('images/cloud.png')
-  upperSecond.renderImage('images/cloud2.png')
-  upperLast.renderImage('images/cloud3.png')
+  // Flying cars in the sky
+  upperFirst.renderFlyingCar()
+  upperSecond.renderFlyingCar()
+  upperLast.renderFlyingCar()
   upperFirst.x -= 2 + (gameSpeed / 700)
   upperSecond.x -= 2 + (gameSpeed / 700)
   upperLast.x -= 2 + (gameSpeed / 700)
-  midFirst.renderImage('images/treeG.png')
-  midSecond.renderImage('images/treeG2.png') 
+  
+  // Background buildings/structures (rendered as dark silhouettes)
+  ctx.fillStyle = 'rgba(40, 30, 20, 0.5)'
+  ctx.fillRect(midFirst.x, midFirst.y, midFirst.width, midFirst.height)
+  ctx.fillRect(midSecond.x, midSecond.y, midSecond.width, midSecond.height)
   midFirst.x -= 3 + (gameSpeed / 500)
   midSecond.x -= 3 + (gameSpeed / 500)
-  botFirst.renderImage('images/treeG3.png') 
-  botSecond.renderImage('images/treeG4.png') 
+  if (midFirst.x <= -midFirst.width) midFirst.x = 1400
+  if (midSecond.x <= -midSecond.width) midSecond.x = 1400
+  
+  // More distant structures
+  ctx.fillStyle = 'rgba(50, 40, 30, 0.3)'
+  ctx.fillRect(botFirst.x, botFirst.y, botFirst.width, botFirst.height)
+  ctx.fillRect(botSecond.x, botSecond.y, botSecond.width, botSecond.height)
   botFirst.x -= 9 + (gameSpeed / 350)
   botSecond.x -= 9 + (gameSpeed / 350)
-  trapsOne.renderTrap('images/treeG5.png')  
-  trapsTwo.renderTrap('images/treeG5.png')
-  trapsThree.renderTrap('images/treeG3.png')
-  trapsFour.renderTrap('images/treeG4.png')
+  if (botFirst.x <= -botFirst.width) botFirst.x = 1400
+  if (botSecond.x <= -botSecond.width) botSecond.x = 1400
+  
+  // Cyber killers and holes as obstacles
+  trapsOne.renderCyberKiller()
+  trapsTwo.renderHole()
+  trapsThree.renderCyberKiller()
+  trapsFour.renderHole()
   trapsOne.x -= 10 + (gameSpeed / 100)
   trapsTwo.x -= 10 + (gameSpeed / 100)
   trapsThree.x -= 10 + (gameSpeed / 100)
@@ -357,48 +484,48 @@ function pauseGame() {
 }
 
 function drawPouse(count) {
-  ctx.shadowColor = 'rgba(255, 0, 255, 0.9)'
+  ctx.shadowColor = 'rgba(255, 140, 0, 0.9)'
   ctx.shadowBlur = 20
-  ctx.fillStyle = '#FF00FF'
+  ctx.fillStyle = '#FF8C00'
   ctx.font = "bold 160px 'Courier New', monospace"
   ctx.fillText(`${count}`, 650, 300)
-  ctx.shadowColor = 'rgba(0, 255, 255, 0.9)'
+  ctx.shadowColor = 'rgba(255, 140, 0, 0.9)'
   ctx.shadowBlur = 15
-  ctx.fillStyle = '#00FFFF'
+  ctx.fillStyle = '#D4A574'
   ctx.font = "bold 60px 'Courier New', monospace"
   ctx.fillText(`POINTS: ${countPoints}`, 450, 450)
   ctx.shadowBlur = 0
 }
 
 function renderPoints(points) {
-  ctx.shadowColor = 'rgba(0, 255, 255, 0.8)'
+  ctx.shadowColor = 'rgba(255, 140, 0, 0.8)'
   ctx.shadowBlur = 8
-  ctx.fillStyle = '#00FFFF'
+  ctx.fillStyle = '#FF8C00'
   ctx.font = "bold 40px 'Courier New', monospace"
   ctx.fillText(`${userName}: ${points}`, 620, 30)
   ctx.shadowBlur = 0
 }
 
 function renderAmmo() {
-  ctx.shadowColor = 'rgba(255, 0, 255, 0.8)'
+  ctx.shadowColor = 'rgba(255, 140, 0, 0.8)'
   ctx.shadowBlur = 8
-  ctx.fillStyle = '#FF00FF'
+  ctx.fillStyle = '#FF8C00'
   ctx.font = "bold 30px 'Courier New', monospace"
   ctx.fillText('AMMO:', 20, 35)
   ctx.shadowBlur = 0
   
-  // Draw cyberpunk ammunition bullets
+  // Draw ammunition bullets in Blade Runner style
   for (let i = 0; i < 3; i++) {
     if (i < ammunition) {
-      // Active ammunition - neon glow
-      ctx.fillStyle = '#00FFFF'
-      ctx.strokeStyle = '#0080FF'
-      ctx.shadowColor = 'rgba(0, 255, 255, 0.9)'
+      // Active ammunition - orange glow
+      ctx.fillStyle = '#FF8C00'
+      ctx.strokeStyle = '#D4A574'
+      ctx.shadowColor = 'rgba(255, 140, 0, 0.9)'
       ctx.shadowBlur = 10
     } else {
       // Empty ammunition - dimmed
-      ctx.fillStyle = 'rgba(0, 255, 255, 0.2)'
-      ctx.strokeStyle = 'rgba(0, 128, 255, 0.3)'
+      ctx.fillStyle = 'rgba(255, 140, 0, 0.2)'
+      ctx.strokeStyle = 'rgba(212, 165, 116, 0.3)'
       ctx.shadowBlur = 0
     }
     
@@ -416,10 +543,10 @@ function renderAmmo() {
 }
 
 function renderLine() {
-  // Neon ground line
-  ctx.strokeStyle = "#00FFFF"
-  ctx.shadowColor = 'rgba(0, 255, 255, 0.8)'
-  ctx.shadowBlur = 10
+  // Sandy ground line with orange glow
+  ctx.strokeStyle = "#D4A574"
+  ctx.shadowColor = 'rgba(255, 140, 0, 0.6)'
+  ctx.shadowBlur = 8
   ctx.setLineDash([10, 5])
   ctx.lineWidth = 2
   ctx.beginPath()
@@ -431,110 +558,121 @@ function renderLine() {
 }
 
 function renderBg() {
-  // Cyberpunk gradient background (dark with neon undertones)
+  // Blade Runner sandy/dune atmosphere - orange haze
   const gradient = ctx.createLinearGradient(0, 0, 0, canvasHeight)
-  gradient.addColorStop(0, '#0A0A1A')
-  gradient.addColorStop(0.5, '#1A0A2E')
-  gradient.addColorStop(1, '#16213E')
+  gradient.addColorStop(0, '#3D2817')  // Dark brown at top
+  gradient.addColorStop(0.3, '#5C3D2E') // Mid brown
+  gradient.addColorStop(0.7, '#8B6F47') // Sandy brown
+  gradient.addColorStop(1, '#A0826D')   // Lighter sandy at bottom
   ctx.fillStyle = gradient
   ctx.fillRect(0, 0, canvasWidth, canvasHeight)
   
-  // Add subtle neon grid effect
-  ctx.strokeStyle = 'rgba(0, 255, 255, 0.1)'
-  ctx.lineWidth = 1
-  // Vertical lines
-  for (let i = 0; i < canvasWidth; i += 50) {
-    ctx.beginPath()
-    ctx.moveTo(i, 0)
-    ctx.lineTo(i, canvasHeight)
-    ctx.stroke()
-  }
-  // Horizontal lines
-  for (let i = 0; i < canvasHeight; i += 50) {
-    ctx.beginPath()
-    ctx.moveTo(0, i)
-    ctx.lineTo(canvasWidth, i)
-    ctx.stroke()
-  }
+  // Add hazy atmosphere with orange fog
+  ctx.fillStyle = 'rgba(255, 140, 0, 0.05)'
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight * 0.6)
 }
 
 function renderMeme(x, y) {
-  const img = new Image();
-  img.src = 'images/meme.png'
-  // Create running animation by alternating the meme position
+  // Create running animation
   const bounce = Math.abs(Math.sin(animationFrame * 0.2)) * 3
   const tilt = Math.sin(animationFrame * 0.15) * 0.1
   ctx.save()
   ctx.translate(x + 25, y + 25)
   ctx.rotate(tilt)
   
-  // Draw character body with cyberpunk neon glow
-  ctx.shadowColor = 'rgba(0, 255, 255, 0.6)'
-  ctx.shadowBlur = 15
-  ctx.shadowOffsetX = 0
-  ctx.shadowOffsetY = 0
-  ctx.drawImage(img, -25, -25 - bounce, 50, 50)
+  // Draw Blade Runner-style character body (no image, drawn directly)
+  // Trench coat body
+  ctx.fillStyle = '#4A3829'
+  ctx.strokeStyle = '#8B6F47'
+  ctx.lineWidth = 2
+  ctx.shadowColor = 'rgba(255, 140, 0, 0.3)'
+  ctx.shadowBlur = 10
   
-  // Add neon outline to character
-  ctx.strokeStyle = '#00FFFF'
-  ctx.lineWidth = 1.5
-  ctx.globalAlpha = 0.6
-  ctx.strokeRect(-25, -25 - bounce, 50, 50)
-  ctx.globalAlpha = 1
+  // Main body coat
+  ctx.beginPath()
+  ctx.moveTo(-15, -10 - bounce)
+  ctx.lineTo(-18, 20)
+  ctx.lineTo(18, 20)
+  ctx.lineTo(15, -10 - bounce)
+  ctx.closePath()
+  ctx.fill()
+  ctx.stroke()
+  
+  // Head - detective with hat silhouette
+  ctx.fillStyle = '#2C1810'
+  ctx.beginPath()
+  ctx.ellipse(0, -20 - bounce, 10, 12, 0, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.stroke()
+  
+  // Fedora hat brim
+  ctx.fillStyle = '#3D2817'
+  ctx.fillRect(-14, -24 - bounce, 28, 4)
+  ctx.strokeRect(-14, -24 - bounce, 28, 4)
+  
+  // Hat top
+  ctx.fillRect(-8, -32 - bounce, 16, 8)
+  ctx.strokeRect(-8, -32 - bounce, 16, 8)
+  
+  // Face detail - minimal features
+  ctx.fillStyle = '#D4A574'
+  ctx.fillRect(-6, -18 - bounce, 12, 8)
+  
+  // Eyes with orange glow
+  ctx.fillStyle = '#FF8C00'
+  ctx.shadowColor = 'rgba(255, 140, 0, 0.8)'
+  ctx.shadowBlur = 4
+  ctx.fillRect(-6, -16 - bounce, 3, 2)
+  ctx.fillRect(3, -16 - bounce, 3, 2)
+  ctx.shadowBlur = 0
   
   // Reset shadow for other elements
   ctx.shadowBlur = 0
-  ctx.shadowOffsetX = 0
-  ctx.shadowOffsetY = 0
   
-  // Draw cyberpunk legs with neon accents
+  // Draw legs with running animation
   const legSwing = Math.sin(animationFrame * 0.3) * 8
-  ctx.fillStyle = '#1A1A2E'
-  ctx.strokeStyle = '#FF00FF'
+  ctx.fillStyle = '#3D2817'
+  ctx.strokeStyle = '#8B6F47'
   ctx.lineWidth = 2.5
   
-  // Back leg with glow
-  ctx.shadowColor = 'rgba(255, 0, 255, 0.8)'
-  ctx.shadowBlur = 5
+  // Back leg
   ctx.beginPath()
   ctx.moveTo(-5, 20)
   ctx.lineTo(-5 - legSwing, 35)
   ctx.stroke()
   
-  // Front leg with glow
+  // Front leg
   ctx.beginPath()
   ctx.moveTo(5, 20)
   ctx.lineTo(5 + legSwing, 35)
   ctx.stroke()
   
-  ctx.shadowBlur = 0
-  
-  // Draw futuristic Blade Runner-style shotgun
+  // Draw Blade Runner-style shotgun
   const gunRecoil = shootingAnimation > 0 ? -5 : 0
   
-  // Main shotgun body - sleek metallic
+  // Main shotgun body - worn metallic
   const gradient = ctx.createLinearGradient(8, -8, 40 + gunRecoil, 5)
-  gradient.addColorStop(0, '#1C1C1C')
-  gradient.addColorStop(0.5, '#4A4A4A')
-  gradient.addColorStop(1, '#2C2C2C')
+  gradient.addColorStop(0, '#2C2416')
+  gradient.addColorStop(0.5, '#5C4A3A')
+  gradient.addColorStop(1, '#3D2817')
   ctx.fillStyle = gradient
   ctx.fillRect(20 + gunRecoil, -8, 22, 14)
   
-  // Neon energy core running along barrel
-  ctx.strokeStyle = '#00FFFF'
+  // Orange energy core running along barrel
+  ctx.strokeStyle = '#FF8C00'
   ctx.lineWidth = 2
-  ctx.shadowColor = 'rgba(0, 255, 255, 0.9)'
+  ctx.shadowColor = 'rgba(255, 140, 0, 0.9)'
   ctx.shadowBlur = 8
   ctx.beginPath()
   ctx.moveTo(20 + gunRecoil, -1)
   ctx.lineTo(42 + gunRecoil, -1)
   ctx.stroke()
   
-  // Cyberpunk barrel accents
-  ctx.strokeStyle = '#FF0080'
+  // Weathered barrel accents
+  ctx.strokeStyle = '#8B6F47'
   ctx.lineWidth = 1
-  ctx.shadowColor = 'rgba(255, 0, 128, 0.7)'
-  ctx.shadowBlur = 5
+  ctx.shadowColor = 'rgba(139, 111, 71, 0.5)'
+  ctx.shadowBlur = 3
   for (let i = 0; i < 3; i++) {
     const xPos = 24 + gunRecoil + (i * 5)
     ctx.beginPath()
@@ -546,21 +684,21 @@ function renderMeme(x, y) {
   ctx.shadowBlur = 0
   
   // Metallic border for shotgun
-  ctx.strokeStyle = '#666666'
+  ctx.strokeStyle = '#4A3829'
   ctx.lineWidth = 2
   ctx.strokeRect(20 + gunRecoil, -8, 22, 14)
   
-  // Futuristic grip with glowing elements
-  ctx.fillStyle = '#0F0F0F'
+  // Grip with orange glow
+  ctx.fillStyle = '#2C1810'
   ctx.fillRect(12 + (gunRecoil * 0.5), -7, 10, 12)
-  ctx.strokeStyle = '#00FF00'
+  ctx.strokeStyle = '#FF8C00'
   ctx.lineWidth = 1.5
-  ctx.shadowColor = 'rgba(0, 255, 0, 0.7)'
+  ctx.shadowColor = 'rgba(255, 140, 0, 0.5)'
   ctx.shadowBlur = 6
   ctx.strokeRect(12 + (gunRecoil * 0.5), -7, 10, 12)
   
   // Grip detail lines
-  ctx.strokeStyle = '#00FF00'
+  ctx.strokeStyle = '#D4A574'
   ctx.lineWidth = 1
   for (let i = 0; i < 4; i++) {
     ctx.beginPath()
@@ -571,47 +709,44 @@ function renderMeme(x, y) {
   
   ctx.shadowBlur = 0
   
-  // Stock with neon accent
-  ctx.fillStyle = '#1A1A1A'
+  // Stock
+  ctx.fillStyle = '#3D2817'
   ctx.fillRect(8, -6, 8, 14)
-  ctx.strokeStyle = '#FF00FF'
+  ctx.strokeStyle = '#8B6F47'
   ctx.lineWidth = 1.5
-  ctx.shadowColor = 'rgba(255, 0, 255, 0.7)'
-  ctx.shadowBlur = 5
   ctx.strokeRect(8, -6, 8, 14)
-  ctx.shadowBlur = 0
   
-  // Trigger guard with glow
-  ctx.strokeStyle = '#00FFFF'
+  // Trigger guard
+  ctx.strokeStyle = '#FF8C00'
   ctx.lineWidth = 2
-  ctx.shadowColor = 'rgba(0, 255, 255, 0.8)'
-  ctx.shadowBlur = 5
+  ctx.shadowColor = 'rgba(255, 140, 0, 0.6)'
+  ctx.shadowBlur = 4
   ctx.beginPath()
   ctx.arc(18, 2, 3, 0, Math.PI)
   ctx.stroke()
   ctx.shadowBlur = 0
   
-  // Enhanced Blade Runner-style muzzle flash when shooting
+  // Enhanced muzzle flash when shooting - orange/red Blade Runner style
   if (shootingAnimation > 0) {
-    // Outer electric flash (cyan/magenta)
-    ctx.fillStyle = `rgba(0, 255, 255, ${shootingAnimation / 8})`
-    ctx.shadowColor = 'rgba(0, 255, 255, 1)'
+    // Outer flash
+    ctx.fillStyle = `rgba(255, 140, 0, ${shootingAnimation / 8})`
+    ctx.shadowColor = 'rgba(255, 140, 0, 1)'
     ctx.shadowBlur = 20
     ctx.beginPath()
     ctx.arc(44, -1, 14, 0, Math.PI * 2)
     ctx.fill()
     
-    // Middle flash (magenta)
-    ctx.fillStyle = `rgba(255, 0, 255, ${shootingAnimation / 10})`
-    ctx.shadowColor = 'rgba(255, 0, 255, 1)'
+    // Middle flash
+    ctx.fillStyle = `rgba(255, 69, 0, ${shootingAnimation / 10})`
+    ctx.shadowColor = 'rgba(255, 69, 0, 1)'
     ctx.shadowBlur = 15
     ctx.beginPath()
     ctx.arc(44, -1, 10, 0, Math.PI * 2)
     ctx.fill()
     
-    // Inner bright core (white-cyan)
-    ctx.fillStyle = `rgba(255, 255, 255, ${shootingAnimation / 12})`
-    ctx.shadowColor = 'rgba(255, 255, 255, 1)'
+    // Inner bright core
+    ctx.fillStyle = `rgba(255, 200, 100, ${shootingAnimation / 12})`
+    ctx.shadowColor = 'rgba(255, 200, 100, 1)'
     ctx.shadowBlur = 10
     ctx.beginPath()
     ctx.arc(44, -1, 6, 0, Math.PI * 2)
@@ -620,12 +755,12 @@ function renderMeme(x, y) {
     // Energy discharge particles
     ctx.shadowBlur = 8
     for (let i = 0; i < 5; i++) {
-      const angle = (Math.PI / 4) * (i - 2) // Wider spread
+      const angle = (Math.PI / 4) * (i - 2)
       const dist = 10 + Math.random() * 6
       const px = 44 + Math.cos(angle) * dist
       const py = -1 + Math.sin(angle) * dist
-      ctx.fillStyle = i % 2 === 0 ? `rgba(0, 255, 255, ${shootingAnimation / 15})` : `rgba(255, 0, 255, ${shootingAnimation / 15})`
-      ctx.shadowColor = i % 2 === 0 ? 'rgba(0, 255, 255, 1)' : 'rgba(255, 0, 255, 1)'
+      ctx.fillStyle = `rgba(255, ${100 + Math.random() * 100}, 0, ${shootingAnimation / 15})`
+      ctx.shadowColor = 'rgba(255, 140, 0, 1)'
       ctx.beginPath()
       ctx.arc(px, py, 3, 0, Math.PI * 2)
       ctx.fill()
@@ -645,12 +780,12 @@ document.addEventListener('keydown', (event) => {
     const currentTime = Date.now()
     // Check if space was pressed within 300ms for double jump
     if (currentTime - lastSpacePress < 300 && jumpCount === 1 && canDoubleJump) {
-      posY = 350
+      posY = 300  // Higher double jump
       g = 3
       jumpCount = 2
       canDoubleJump = false
     } else if (jumpCount === 0) {
-      posY = 394
+      posY = 360  // Higher single jump
       jumpCount = 1
     }
     lastSpacePress = currentTime
@@ -665,12 +800,12 @@ function jumpOnClick() {
   const currentTime = Date.now()
   // Check if space was pressed within 300ms for double jump
   if (currentTime - lastSpacePress < 300 && jumpCount === 1 && canDoubleJump) {
-    posY = 350
+    posY = 300  // Higher double jump
     g = 3
     jumpCount = 2
     canDoubleJump = false
   } else if (jumpCount === 0) {
-    posY = 394
+    posY = 360  // Higher single jump
     jumpCount = 1
   }
   lastSpacePress = currentTime
