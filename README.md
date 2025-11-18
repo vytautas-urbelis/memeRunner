@@ -31,7 +31,7 @@ To run MemeRunner locally, follow these steps:
 
 - **Start the Game:** Open the `index.html` file in your browser to start the game.
 - **Jump:** Press the space bar to jump and avoid obstacles. Press space twice quickly for a double jump.
-- **Shoot:** Press 'X' or 'F' key to shoot obstacles, or click the "SHOOT" button. You start with 3 ammunition units.
+- **Shoot:** Press 'Enter' key to shoot obstacles, or click the "SHOOT" button. You start with 3 ammunition units.
 - **Ammunition:** Ammo regenerates automatically at +1 every 3 seconds when below the maximum of 3 units.
 - **Scoring:** Earn points by avoiding obstacles. Destroy obstacles by shooting them for +50 bonus points!
 - **Pause/Resume Game:** The game pauses automatically when an obstacle is hit and can be resumed by following on-screen instructions.
