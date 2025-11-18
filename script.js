@@ -403,33 +403,105 @@ function renderMeme(x, y) {
   ctx.save()
   ctx.translate(x + 25, y + 25)
   ctx.rotate(tilt)
+  
+  // Draw character body with more detail
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.3)'
+  ctx.shadowBlur = 5
+  ctx.shadowOffsetX = 2
+  ctx.shadowOffsetY = 2
   ctx.drawImage(img, -25, -25 - bounce, 50, 50)
   
-  // Draw gun
-  ctx.fillStyle = '#333'
+  // Reset shadow for gun
+  ctx.shadowBlur = 0
+  ctx.shadowOffsetX = 0
+  ctx.shadowOffsetY = 0
+  
+  // Draw legs for running animation
+  const legSwing = Math.sin(animationFrame * 0.3) * 8
+  ctx.fillStyle = '#4A4A4A'
   ctx.strokeStyle = '#000'
   ctx.lineWidth = 2
   
-  // Gun barrel
+  // Back leg
+  ctx.beginPath()
+  ctx.moveTo(-5, 20)
+  ctx.lineTo(-5 - legSwing, 35)
+  ctx.stroke()
+  
+  // Front leg
+  ctx.beginPath()
+  ctx.moveTo(5, 20)
+  ctx.lineTo(5 + legSwing, 35)
+  ctx.stroke()
+  
+  // Draw shotgun
+  ctx.fillStyle = '#2C2C2C'
+  ctx.strokeStyle = '#000'
+  ctx.lineWidth = 2
+  
+  // Shotgun barrel (wider and shorter than regular gun)
   const gunRecoil = shootingAnimation > 0 ? -5 : 0
-  ctx.fillRect(20 + gunRecoil, -5, 20, 8)
-  ctx.strokeRect(20 + gunRecoil, -5, 20, 8)
+  ctx.fillRect(20 + gunRecoil, -7, 18, 12)
+  ctx.strokeRect(20 + gunRecoil, -7, 18, 12)
   
-  // Gun handle
-  ctx.fillRect(15, -5, 8, 12)
-  ctx.strokeRect(15, -5, 8, 12)
+  // Double barrel detail
+  ctx.strokeStyle = '#444'
+  ctx.lineWidth = 1
+  ctx.beginPath()
+  ctx.moveTo(20 + gunRecoil, -1)
+  ctx.lineTo(38 + gunRecoil, -1)
+  ctx.stroke()
   
-  // Muzzle flash effect when shooting
+  // Pump action forearm
+  ctx.fillStyle = '#654321'
+  ctx.strokeStyle = '#000'
+  ctx.lineWidth = 2
+  ctx.fillRect(12 + (gunRecoil * 0.5), -6, 8, 10)
+  ctx.strokeRect(12 + (gunRecoil * 0.5), -6, 8, 10)
+  
+  // Shotgun stock/handle
+  ctx.fillStyle = '#654321'
+  ctx.fillRect(8, -5, 8, 12)
+  ctx.strokeRect(8, -5, 8, 12)
+  
+  // Trigger guard
+  ctx.strokeStyle = '#2C2C2C'
+  ctx.lineWidth = 2
+  ctx.beginPath()
+  ctx.arc(18, 2, 3, 0, Math.PI)
+  ctx.stroke()
+  
+  // Enhanced shotgun muzzle flash effect when shooting
   if (shootingAnimation > 0) {
+    // Outer flash (wider spread for shotgun)
     ctx.fillStyle = `rgba(255, 165, 0, ${shootingAnimation / 10})`
+    ctx.beginPath()
+    ctx.arc(40, -1, 12, 0, Math.PI * 2)
+    ctx.fill()
+    
+    // Middle flash
+    ctx.fillStyle = `rgba(255, 140, 0, ${shootingAnimation / 12})`
     ctx.beginPath()
     ctx.arc(40, -1, 8, 0, Math.PI * 2)
     ctx.fill()
     
+    // Inner flash (bright center)
     ctx.fillStyle = `rgba(255, 69, 0, ${shootingAnimation / 15})`
     ctx.beginPath()
     ctx.arc(40, -1, 5, 0, Math.PI * 2)
     ctx.fill()
+    
+    // Add shotgun blast particles
+    for (let i = 0; i < 3; i++) {
+      const angle = (Math.PI / 6) * (i - 1) // Spread particles
+      const dist = 8 + Math.random() * 4
+      const px = 40 + Math.cos(angle) * dist
+      const py = -1 + Math.sin(angle) * dist
+      ctx.fillStyle = `rgba(255, 200, 0, ${shootingAnimation / 20})`
+      ctx.beginPath()
+      ctx.arc(px, py, 3, 0, Math.PI * 2)
+      ctx.fill()
+    }
     
     shootingAnimation--
   }
@@ -452,7 +524,7 @@ document.addEventListener('keydown', (event) => {
       jumpCount = 1
     }
     lastSpacePress = currentTime
-  } else if (key === 'x' || key === 'X' || key === 'f' || key === 'F') {
+  } else if (key === 'Enter') {
     shoot()
   }
 }, 
